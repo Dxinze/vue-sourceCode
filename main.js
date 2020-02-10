@@ -1,10 +1,3 @@
-let tmpNode = document.querySelector('#root')
-
-let data = {
-	name: '名字',
-	message: '第一条消息'
-}
-
 let _r = /\{\{(.+?)\}\}/g
 
 function compiler(template, data) {
@@ -25,9 +18,32 @@ function compiler(template, data) {
 	}
 }
 
-let generateNode = tmpNode.cloneNode(true)
-compiler(generateNode, data)
-root.parentNode.replaceChild(generateNode, root)
+function DVue(options) {
+	this._data = options.data
+	this._el = options.el
+	this._templateDom = document.querySelector(this._el)
+	this._parent = this._templateDom.parentNode
+	this.render()
+}
 
-console.log(tmpNode)
-console.log(generateNode)
+DVue.prototype.render = function() {
+	this.compiler()
+}
+
+DVue.prototype.compiler = function() {
+	let realDOM = this._templateDom.cloneNode(true)
+	compiler(realDOM, this._data)
+	this.update(realDOM)
+}
+
+DVue.prototype.update = function(realDOM) {
+	this._parent.replaceChild(realDOM, document.querySelector('#root'))
+}
+
+let app = new DVue({
+	el: '#root',
+	data: {
+		name: '我的名字',
+		message: '一条消息'
+	}
+})
