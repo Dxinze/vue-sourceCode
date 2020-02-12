@@ -22,8 +22,8 @@ class DVUE {
 			if (type === 3) {
 				let txt = childNodes[i].nodeValue
 				txt = txt.replace(_r, (_, g) => {
-					let key = g.trim()
-					let value = data[key]
+					let path = g.trim()
+					let value = this.getValuePath(this._data, path)
 					return value
 				})
 				childNodes[i].nodeValue = txt
@@ -41,6 +41,22 @@ class DVUE {
 		console.log(tmpDOM)
 		console.log(pageDOM)
 	}
+
+	getValuePath(obj, path) { 
+		let paths = path.split('.') // person.name.firstname -> ['person', 'name', 'firstname']
+		let res = obj
+		let prop
+		while(prop = paths.shift()) {
+			res = res[prop]
+		}
+		return res
+	}
+}
+
+class Vnode {
+	constructor() {
+
+	}
 }
 
 
@@ -48,7 +64,11 @@ class DVUE {
 let app = new DVUE({
 	el: '#root',
 	data: {
-		name: '我的名字',
-		message: '一条消息'
+		person: {
+			name: {
+				firstname: 'jack',
+				lastname: 'ma'
+			}
+		}
 	}
 })
