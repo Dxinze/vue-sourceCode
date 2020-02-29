@@ -76,11 +76,37 @@ function combine(vnode, data) {
 	return _vnode
 }
 
+// 将虚拟dom生成真正的dom
+function parseVnode(vnode) {
+	let type = vnode.type
+	let _node = null
+	if (type === 3) {
+		return document.createTextNode(vnode.value)
+	} else if (type === 1) {
+		_node = document.createElement(vnode.tag)
+		let data = vnode.data
+		Object.keys(data).forEach((key) => {
+			let attrName = key
+			let attrValue = data[key]
+			_node.setAttribute(attrName, attrValue)
+		})
+
+		let children = vnode.children
+		children.forEach( subvnode => {
+			_node.appendChild(parseVnode(subvnode))
+		})
+
+		return _node
+	}
+}
+
 class DVUE {
 	constructor(options) {
+		this._options = options
 		this._data = options.data
-		this._el = options.el // vue这里是字符串，但这里简化使用html dom
-		this._templateDom = document.querySelector(this._el)
+		let elm = document.querySelector(options.el) // vue这里是字符串，但这里简化使用html dom
+		this._templateDom = elm
+		this._parent = elm.parentNode
 		this.mount()
 	}
 
@@ -101,14 +127,14 @@ class DVUE {
 		let AST = generateVirtualNode(this._templateDom)
 		return function render() {
 			let _tmp = combine(AST, this._data)
-			console.log(AST)
-			console.log(_tmp)
 			return _tmp
 		}
 	}
 
-	update() {
-
+	// 这里的update函数只是简单的替换了html中的节点
+	update(vnode) {
+		let realDom = parseVnode(vnode)
+		this._parent.replaceChild(realDom, document.querySelector('#root'))
 	}
 }
 
