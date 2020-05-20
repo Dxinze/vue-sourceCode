@@ -1,15 +1,11 @@
-// 第一步：字符串模板（真正的node） -> AST(抽象语法树)
+// 第一步：字符串模板（这里是真正的node） -> AST(抽象语法树)
 // 第二步：AST -> 虚拟DOM
 // 第三步：虚拟DOM -> 结合数据 -> 再生成一个vnode和html dom进行绑定
-
 
 // 虚拟dom的构造函数
 class VirtualDOM {
 	constructor(tag, data, value, type) {
-		this.tag = tag && tag.toLowerCase(),
-		this.data = data,
-		this.value = value,
-		this.type = type
+		;(this.tag = tag && tag.toLowerCase()), (this.data = data), (this.value = value), (this.type = type)
 		this.children = []
 	}
 
@@ -19,11 +15,11 @@ class VirtualDOM {
 }
 
 let _r = /\{\{(.+?)\}\}/g
-function getValuePath(obj, path) { 
+function getValuePath(obj, path) {
 	let paths = path.split('.') // person.name.firstname -> ['person', 'name', 'firstname']
 	let res = obj
 	let prop
-	while(prop = paths.shift()) {
+	while ((prop = paths.shift())) {
 		res = res[prop]
 	}
 	return res
@@ -85,14 +81,14 @@ function parseVnode(vnode) {
 	} else if (type === 1) {
 		_node = document.createElement(vnode.tag)
 		let data = vnode.data
-		Object.keys(data).forEach((key) => {
+		Object.keys(data).forEach(key => {
 			let attrName = key
 			let attrValue = data[key]
 			_node.setAttribute(attrName, attrValue)
 		})
 
 		let children = vnode.children
-		children.forEach( subvnode => {
+		children.forEach(subvnode => {
 			_node.appendChild(parseVnode(subvnode))
 		})
 
@@ -125,6 +121,7 @@ class DVUE {
 	//生成render函数，用于缓存AST
 	createRenderFn() {
 		let AST = generateVirtualNode(this._templateDom)
+		console.log(AST)
 		return function render() {
 			let _tmp = combine(AST, this._data)
 			return _tmp
@@ -135,6 +132,7 @@ class DVUE {
 	update(vnode) {
 		let realDom = parseVnode(vnode)
 		this._parent.replaceChild(realDom, document.querySelector('#root'))
+		console.log(realDom)
 	}
 }
 
@@ -150,9 +148,3 @@ let app = new DVUE({
 		}
 	}
 })
-
-
-
-
-
-
